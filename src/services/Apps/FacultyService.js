@@ -9,8 +9,10 @@ export const updateFaculties = (faculty, crudType) => {
       Data.faculties.push(faculty);
       return true;
     case XPCrudType.Update:
-      Data.faculties = Data.faculties.filter(f => (f.id !== faculty.id));
-      Data.faculties.push(faculty);
+      const index = Data.faculties.findIndex((m) => m.id === faculty.id);
+      if (index !== -1) {
+        Data.faculties[index] = faculty;
+      }
       return true;
     case XPCrudType.Delete:
       Data.faculties = Data.faculties.filter((m) => m.id !== faculty.id);

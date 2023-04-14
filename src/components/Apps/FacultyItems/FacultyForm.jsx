@@ -1,5 +1,6 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import { Form } from 'react-bootstrap';
+import tableData from '../../../services/Apps/db.json';
 
 
 export const useXPForm = ({ formObj }) => {
@@ -23,7 +24,7 @@ export const useXPForm = ({ formObj }) => {
     const errors = {};
 
     // Handle faculty Name
-    if(!form.name || form.name.length === "") {
+    if (!form.name || form.name.length === "") {
       errors.name = "Kindly supply Faculty name";
     } else if (form.name.length < 3) {
       errors.name = "Faculty name must be at least 3 characters";
@@ -31,22 +32,22 @@ export const useXPForm = ({ formObj }) => {
       errors.name = "Faculty name must be less than 50 characters";
     }
     // Handle faculty Code
-    if(!form.code || form.code.length === "") {
+    if (!form.code || form.code.length === "") {
       errors.code = "Kindly supply Faculty code";
     } else if (form.code.length < 2) {
       errors.code = "Faculty code must be at least 2 characters";
     } else if (form.code.length > 10) {
       errors.code = "Faculty code must be less than 10 characters";
-    } 
+    }
     // Handle faculty UniqueId
-    if(!form.uniqueId || form.uniqueId.length === "") {
+    if (!form.uniqueId || form.uniqueId.length === "") {
       errors.uniqueId = "Kindly supply Faculty UniqueId";
     } else if (form.uniqueId.length < 4) {
       errors.uniqueId = "Faculty UniqueId must be at least 4 characters";
     } else if (form.uniqueId.length > 10) {
       errors.uniqueId = "Faculty UniqueId must be less than 10 characters";
     }
-    
+
     return errors;
   };
 
@@ -55,11 +56,26 @@ export const useXPForm = ({ formObj }) => {
     setFormErrors({});
   };
 
-  return {form, handleValueChange, formErrors, validateForm, initForm, setFormErrors};
+  const validateMultipleData = (form) => {
+    let validateMultipleDataErrors = {};
+    if (form.id === 0) {
+      tableData.faculties.forEach(table => {
+        if (table.name === form.name) {
+          validateMultipleDataErrors.name = `${form.name} already exists`;
+        }
+      })
+    }
+    return validateMultipleDataErrors;
+  }
+
+  console.log(form, tableData, validateMultipleData(form));
+
+  return { form, handleValueChange, formErrors, validateForm, initForm, setFormErrors, validateMultipleData };
 }
 
 
-function FacultyForm({ form, handleValueChange, errors}) {
+function FacultyForm({ form, handleValueChange, errors, formErrors, validateForm }) {
+
   return (
     <Form className="container mb-3 mt-3">
       <input
@@ -78,6 +94,7 @@ function FacultyForm({ form, handleValueChange, errors}) {
           value={form.name}
           onChange={handleValueChange}
         />
+        <p className='text-danger'>{formErrors.name}</p>
       </Form.Group>
       <Form.Group controlId="Code">
         <Form.Label>Faculty Code</Form.Label>
@@ -88,6 +105,8 @@ function FacultyForm({ form, handleValueChange, errors}) {
           value={form.code}
           onChange={handleValueChange}
         />
+        <p className='text-danger'>{formErrors.code}</p>
+
       </Form.Group>
       <Form.Group controlId="UniqueId">
         <Form.Label>Faculty UniqueId</Form.Label>
@@ -98,6 +117,7 @@ function FacultyForm({ form, handleValueChange, errors}) {
           value={form.uniqueId}
           onChange={handleValueChange}
         />
+        <p className='text-danger'>{formErrors.uniqueId}</p>
       </Form.Group>
       <Form.Check
         name="isActive"

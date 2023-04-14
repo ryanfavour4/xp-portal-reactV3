@@ -28,8 +28,10 @@ function FacultyGrid() {
     handleValueChange,
     errors,
     initForm,
+    formErrors,
     validateForm,
     setFormErrors,
+    validateMultipleData,
   } = useXPForm({ formObj: formDef });
 
   const onSubmitForm = (e) => {
@@ -37,12 +39,26 @@ function FacultyGrid() {
     const alertObj = XPAlertObj();
     alertObj.icon = XPAlertIcon.byType(XPAlertType.Success);
 
+  
+
+    const sameName = validateMultipleData(form)
+    console.log(sameName);
+
+    if (Object.keys(sameName).length > 0) {
+      alertObj.message = `${sameName.name}`;
+      alertObj.title = "Faculty Error";
+      alertObj.icon = "error";
+      XPInfoAlert(alertObj);
+      return false;
+    }
+
     //ValidateInputs
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return false;
     }
+
 
     if (form.id > 0) {
       //Update
@@ -102,6 +118,7 @@ function FacultyGrid() {
       <div className="d-flex justify-content-between">
         <h1 className="h3 mb-0 text-gray-800">Faculties</h1>
         <AddButton onClick={onRequestAdd}>New Faculty</AddButton>
+        <AddButton onClick={() => {console.log(validateForm())}}>Validate Button</AddButton>
       </div>
 
       <hr />
@@ -121,6 +138,7 @@ function FacultyGrid() {
         content={
           <FacultyForm
             form={form}
+            formErrors={formErrors}
             handleValueChange={handleValueChange}
             errors={errors}
           />
